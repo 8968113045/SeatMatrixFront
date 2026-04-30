@@ -1,0 +1,73 @@
+.filter-card {
+  border: 1px solid #d1d3e2;
+  border-radius: 4px;
+  
+  .card-header {
+    border-radius: 3px 3px 0 0;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+.form-select-sm {
+  border-color: #ced4da;
+  font-size: 0.875rem;
+  padding: 0.25rem 2rem 0.25rem 0.5rem;
+  
+  &:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+}
+
+.text-primary-dark {
+  color: #3b5998;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.category-name {
+  color: #4caf50;
+  font-size: 0.9rem;
+}
+
+.seat-table {
+  th {
+    border-bottom: 2px solid #dee2e6;
+    vertical-align: middle;
+  }
+  
+  td {
+    vertical-align: middle;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+  }
+}
+
+.bg-lighter {
+  background-color: #fcfdfd !important;
+}
+
+.bg-light-yellow {
+  background-color: #faebd7 !important; /* Matches the alternate rows in the screenshot */
+}
+
+.number-input {
+  max-width: 80px;
+  margin: 0 auto;
+  border-radius: 2px;
+  
+  &:focus {
+    border-color: #80bdff;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  }
+  
+  /* Remove arrows from number input */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  &[type=number] {
+    -moz-appearance: textfield;
+  } 
+}

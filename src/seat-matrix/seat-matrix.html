@@ -1,0 +1,194 @@
+<div class="container-fluid mt-4">
+    <!-- Form 1: Filter Form (Image 2) -->
+    <div class="card mb-4 shadow-sm filter-card">
+        <div class="card-header text-white" style="background: linear-gradient(to right, #4a67b9, #6d84cd);">
+            <h6 class="mb-0 fw-bold">View/Edit Seat Matrix</h6>
+        </div>
+        <div class="card-body bg-white pb-2">
+            <form [formGroup]="filterForm" (ngSubmit)="onView()">
+                <div class="row gx-5">
+                    <div class="col-md-5">
+                        <div class="row align-items-center mb-3">
+                            <label class="col-sm-4 col-form-label text-secondary fw-semibold">Stream</label>
+                            <div class="col-sm-8">
+                                <ng-select formControlName="stream" [items]="streams" placeholder="Please Select"
+                                 bindLabel="streamName" bindValue="streamID">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <label class="col-sm-4 col-form-label text-secondary fw-semibold">Institute</label>
+                            <div class="col-sm-8">
+                                <ng-select formControlName="institute" [items]="institutes" placeholder="Please Select"
+                                 bindLabel="instituteName"
+                                >
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <label class="col-sm-4 col-form-label text-secondary fw-semibold">Counselling</label>
+                            <div class="col-sm-8">
+                                <select class="form-select form-select-sm" formControlName="counselling" placeholder="Please Select">
+                                    <option value="1">Counselling -I, II</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 offset-md-1">
+                        <div class="row align-items-center mb-3">
+                            <label class="col-sm-4 col-form-label text-secondary fw-semibold">Institute Type</label>
+                            <div class="col-sm-8">
+                                <ng-select formControlName="instituteType" [items]="instituteTypes" placeholder="Please Select"
+                                    (change)="getInstitute()" bindLabel="typeName" bindValue="typeID">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-3">
+                            <label class="col-sm-4 col-form-label text-secondary fw-semibold">Course</label>
+                            <div class="col-sm-8">
+                                <ng-select formControlName="course" [items]="courses" placeholder="Please Select"
+                                bindLabel="courseName" bindValue="courseID"
+                                >
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3 mb-2">
+                    <button type="submit" class="btn btn-info btn-sm px-4 me-2 text-white fw-bold"
+                        style="background-color: #65b8cd; border-color: #65b8cd;">View</button>
+                    <button type="button"
+                        class="btn btn-outline-secondary btn-sm px-4 fw-bold bg-white text-dark border-secondary"
+                        (click)="onCancel()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form 2: Seat Matrix Grid Form (Image 1) -->
+    @if(isView())
+    {
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0 table-responsive">
+            <form [formGroup]="seatMatrixForm" (ngSubmit)="onSubmitSeatMatrix()">
+                <table class="table table-bordered mb-0 seat-table align-middle">
+                    <thead style="background-color: #f1f3f8;">
+                        <tr>
+                            <th rowspan="2" class="text-center text-primary-dark">Sr.No.</th>
+                            <th rowspan="2" class="text-primary-dark">Category</th>
+                            @if(seatType() == 'noncentral'){
+                            <th colspan="2" class="text-center text-primary-dark">State Seats (85%)</th>
+                            <th colspan="2" class="text-center text-primary-dark">Other State Seats (15%)</th>
+                            }
+
+                            @if(seatType() == 'central'){
+                            <th colspan="1" class="text-center text-primary-dark">NA</th>
+                            <th colspan="1" class="text-center text-primary-dark">PB</th>
+                            <th colspan="1" class="text-center text-primary-dark">CH</th>
+                            <th colspan="1" class="text-center text-primary-dark">HRY</th>
+                            <th colspan="1" class="text-center text-primary-dark">HP</th>
+                            <th colspan="1" class="text-center text-primary-dark">J&K</th>
+                            }
+
+                            <th rowspan="2" class="text-center text-primary-dark"><strong>Total</strong></th>
+                        </tr>
+                        <tr>
+                            @if(seatType() == 'noncentral'){
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Rural</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Rural</th>
+                            }
+
+                            @if(seatType() == 'central'){
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            <th class="text-center text-primary-dark">Urban</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="seatCategories">
+                        @for(cat of seatCategories.controls; track $index){
+                        <tr [formGroupName]="$index"
+                            [ngClass]="{'bg-light-yellow': $index % 2 !== 0, 'bg-lighter': $index % 2 === 0}">
+                            <td class="text-center fw-bold text-secondary">{{ $index + 1 }}</td>
+                            <td class="fw-bold category-name">
+                                {{ cat.get('categoryID')?.value }}-{{ cat.get('categoryName')?.value }}
+                            </td>
+                            @if(seatType() == 'noncentral'){
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="stateNonRural" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="stateRural" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="otherNonRural" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="otherRural" min="0">
+                            </td>
+                            }
+                            
+                            @if(seatType() == 'central'){
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_na_ur" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_pb_ur" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_ch_ur" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_hr_ur" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_hp_ur" min="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_jk_ur" min="0">
+                            </td>
+                            }
+                            <td>
+                                <input type="number" class="form-control form-control-sm text-center number-input"
+                                    formControlName="previousVacant" min="0">
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                <!-- Hidden button so they can save if they hook it up, can be adjusted -->
+                <div class="p-3 text-center" style="background-color: #e3e6f0;">
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Save Matrix Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+
+
+    <!-- Debug Output (shows the generated flat list) -->
+    <div class="card mt-4 mb-5 shadow-sm border-0" *ngIf="savedData">
+        <div class="card-header bg-dark text-white fw-bold">
+            Preview: Generated Flat Data (Sent to Backend)
+        </div>
+        <div class="card-body bg-light" style="max-height: 400px; overflow-y: auto;">
+            <pre class="mb-0 text-success fw-bold">{{ savedData | json }}</pre>
+        </div>
+    </div>
+</div>
