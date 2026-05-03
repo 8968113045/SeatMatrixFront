@@ -71,3 +71,7 @@
     -moz-appearance: textfield;
   } 
 }
+
+.readonly-cls{
+  background-color: #e9ecef;
+}

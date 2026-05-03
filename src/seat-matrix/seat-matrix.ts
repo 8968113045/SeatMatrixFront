@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgClass } from '@angular/common';
 import { SeatMatrixService } from './seat-matrix-service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-seat-matrix',
@@ -10,7 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
   templateUrl: './seat-matrix.html',
   styleUrl: './seat-matrix.css',
 })
-export class SeatMatrix implements OnInit {
+export class SeatMatrix implements OnInit, OnDestroy {
   seatType = signal('noncentral');
   isView = signal(false);
   filterForm!: FormGroup;
@@ -27,6 +28,12 @@ export class SeatMatrix implements OnInit {
   categories: any[] = [];
   requiredCategories: any[] = [];
 
+  streamSubscription!: Subscription;
+  instituteTypeSubscription!: Subscription;
+  instituteSubscription!: Subscription;
+  courseSubscription!: Subscription;
+  courseTypeSubscription!: Subscription;
+
   constructor(
     private fb: FormBuilder,
     private seatMatrixService: SeatMatrixService,
@@ -39,10 +46,29 @@ export class SeatMatrix implements OnInit {
     this.loadDropdownData();
   }
 
-  loadDropdownData(): void {    
+  ngOnDestroy(): void {
+    if (this.streamSubscription) {
+      this.streamSubscription.unsubscribe();
+    }
+
+    if (this.instituteTypeSubscription) {
+      this.instituteTypeSubscription.unsubscribe();
+    }
+    if (this.instituteSubscription) {
+      this.instituteSubscription.unsubscribe();
+    }
+    if (this.courseSubscription) {
+      this.courseSubscription.unsubscribe();
+    }
+    if (this.courseTypeSubscription) {
+      this.courseTypeSubscription.unsubscribe();
+    }
+  }
+
+  loadDropdownData(): void {
     this.seatMatrixService.getStreams().subscribe(data => this.streams = data);
     this.seatMatrixService.getInstituteTypes().subscribe(data => this.instituteTypes = data);
-    this.seatMatrixService.getCourses().subscribe(data => this.courses = data);
+    this.getCourses();
   }
 
   initFilterForm(): void {
@@ -51,14 +77,41 @@ export class SeatMatrix implements OnInit {
       instituteType: [null, [Validators.required]],
       institute: [null, [Validators.required]],
       course: [null, [Validators.required]],
+      courseType: ['N', [Validators.required]],
       counselling: ['1', [Validators.required]]
     });
+    if (!this.streamSubscription) {
+      this.streamSubscription = this.filterForm.get('stream')?.valueChanges.subscribe(res => {
+        this.resetSeatMatrixData();
+      })!;
+    }
+
+    if (!this.instituteTypeSubscription) {
+      this.instituteTypeSubscription = this.filterForm.get('instituteType')?.valueChanges.subscribe(res => {
+        this.resetSeatMatrixData();
+      })!;
+    }
+    if (!this.instituteSubscription) {
+      this.instituteSubscription = this.filterForm.get('institute')?.valueChanges.subscribe(res => {
+        this.resetSeatMatrixData();
+      })!;
+    }
+    if (!this.courseSubscription) {
+      this.courseSubscription = this.filterForm.get('course')?.valueChanges.subscribe(res => {
+        this.resetSeatMatrixData();
+      })!;
+    }
+    if (!this.courseTypeSubscription) {
+      this.courseTypeSubscription = this.filterForm.get('courseType')?.valueChanges.subscribe(res => {
+        this.resetSeatMatrixData();
+      })!;
+    }
   }
 
   initSeatMatrixForm(): void {
     this.seatMatrixForm = this.fb.group({
       seatCategories: this.fb.array([])
-    });    
+    });
   }
 
   get seatCategories(): FormArray {
@@ -79,46 +132,46 @@ export class SeatMatrix implements OnInit {
       ci_ct_hr_ur: [0],
       ci_ct_hp_ur: [0],
       ci_ct_jk_ur: [0],
-      previousVacant: [0]
+      total: [0]
     });
-    if(['01'].includes(this.filterForm.value.institute.instituteType))
-    {
-      if(!['OP', '01', 'SC', 'ST', 'BC'].includes(category.categoryID))
-      {
-        fb.get('otherNonRural')?.disable();
-        fb.get('otherRural')?.disable();
-      }
-      else
-      {
-        fb.get('otherNonRural')?.enable();
-        fb.get('otherRural')?.enable();
-      }   
+    if (this.filterForm.value.course.feeWStatus == 'Y') {
+      fb.get('stateRural')?.disable();
+      fb.get('otherNonRural')?.disable();
+      fb.get('otherRural')?.disable();
     }
-    else if(['02'].includes(this.filterForm.value.institute.instituteType))
-    {
-      if(['OP', 'SC', '13', '04'].includes(category.categoryID))
-      {
-        fb.get('stateNonRural')?.enable();
-        fb.get('stateRural')?.enable();
+    else {
+      if (['01'].includes(this.filterForm.value.institute.instituteType)) {
+        if (!['OP', '01', 'SC', 'ST', 'BC'].includes(category.categoryID)) {
+          fb.get('otherNonRural')?.disable();
+          fb.get('otherRural')?.disable();
+        }
+        else {
+          fb.get('otherNonRural')?.enable();
+          fb.get('otherRural')?.enable();
+        }
       }
-      else
-      {
-        fb.get('stateNonRural')?.disable();
-        fb.get('stateRural')?.disable();
-      }  
-    }
-    else if(['03', '04'].includes(this.filterForm.value.institute.instituteType))
-    {
-      if(['01'].includes(category.categoryID))
-      {
-        fb.get('ci_ct_na_ur')?.enable(),
-        fb.get('ci_ct_pb_ur')?.disable(),
-        fb.get('ci_ct_ch_ur')?.disable(),
-        fb.get('ci_ct_hr_ur')?.disable(),
-        fb.get('ci_ct_hp_ur')?.disable(),
-        fb.get('ci_ct_jk_ur')?.disable()
+      else if (['02'].includes(this.filterForm.value.institute.instituteType)) {
+        if (['OP', 'SC', '13', '04'].includes(category.categoryID)) {
+          fb.get('stateNonRural')?.enable();
+          fb.get('stateRural')?.enable();
+        }
+        else {
+          fb.get('stateNonRural')?.disable();
+          fb.get('stateRural')?.disable();
+        }
+      }
+      else if (['03', '04'].includes(this.filterForm.value.institute.instituteType)) {
+        if (['01'].includes(category.categoryID)) {
+          fb.get('ci_ct_na_ur')?.enable(),
+            fb.get('ci_ct_pb_ur')?.disable(),
+            fb.get('ci_ct_ch_ur')?.disable(),
+            fb.get('ci_ct_hr_ur')?.disable(),
+            fb.get('ci_ct_hp_ur')?.disable(),
+            fb.get('ci_ct_jk_ur')?.disable()
+        }
       }
     }
+
     return fb;
   }
 
@@ -127,7 +180,7 @@ export class SeatMatrix implements OnInit {
       control.patchValue({
         stateNonRural: 0, stateRural: 0,
         otherNonRural: 0, otherRural: 0,
-        previousVacant: 0,
+        total: 0,
         ci_ct_na_ur: 0,
         ci_ct_pb_ur: 0,
         ci_ct_ch_ur: 0,
@@ -140,102 +193,156 @@ export class SeatMatrix implements OnInit {
     // 3. Group the incoming data into the form controls
     flatData.forEach(entry => {
       const categoryControl = this.seatCategories.controls.find(
-        c => c.get('categoryID')?.value  === entry.categoryID
+        c => c.get('categoryID')?.value === entry.categoryID
       );
 
       if (categoryControl) {
         let currentVals = categoryControl.value;
-       
-        if(['PB','OP'].includes(entry.quotaID))
-        {
+        if (['PB', 'OP'].includes(entry.quotaID)) {
           this.seatType.set('noncentral');
           if (entry.quotaID === 'PB' && entry.groupID === 'UR') {
-            categoryControl.patchValue({ stateNonRural: currentVals.stateNonRural + entry.tseat });
+            categoryControl.patchValue({
+              stateNonRural: (currentVals.stateNonRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.stateNonRural ?? 0)
+            });
           } else if (entry.quotaID === 'PB' && entry.groupID === 'RU') {
-            categoryControl.patchValue({ stateRural: currentVals.stateRural + entry.tseat });
+            categoryControl.patchValue({
+              stateRural: (currentVals.stateRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.stateRural ?? 0)
+            });
           } else if (entry.quotaID === 'OP' && entry.groupID === 'UR') {
-            categoryControl.patchValue({ otherNonRural: currentVals.otherNonRural + entry.tseat });
+            categoryControl.patchValue({
+              otherNonRural: (currentVals.otherNonRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.otherNonRural ?? 0)
+            });
           } else if (entry.quotaID === 'OP' && entry.groupID === 'RU') {
-            categoryControl.patchValue({ otherRural: currentVals.otherRural + entry.tseat });
+            categoryControl.patchValue({
+              otherRural: (currentVals.otherRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.otherRural ?? 0)
+            });
           }
         }
-        else if(['UT','OU'].includes(entry.quotaID))
-        {
+        else if (['UT', 'OU'].includes(entry.quotaID)) {
           this.seatType.set('noncentral');
           if (entry.quotaID === 'UT' && entry.groupID === 'UR') {
-            categoryControl.patchValue({ stateNonRural: currentVals.stateNonRural + entry.tseat });
+            categoryControl.patchValue({
+              stateNonRural: (currentVals.stateNonRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.stateNonRural ?? 0)
+            });
           } else if (entry.quotaID === 'UT' && entry.groupID === 'RU') {
-            categoryControl.patchValue({ stateRural: currentVals.stateRural + entry.tseat });
+            categoryControl.patchValue({
+              stateRural: (currentVals.stateRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.stateRural ?? 0)
+            });
           } else if (entry.quotaID === 'OU' && entry.groupID === 'UR') {
-            categoryControl.patchValue({ otherNonRural: currentVals.otherNonRural + entry.tseat });
+            categoryControl.patchValue({
+              otherNonRural: (currentVals.otherNonRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.otherNonRural ?? 0)
+            });
           } else if (entry.quotaID === 'OU' && entry.groupID === 'RU') {
-            categoryControl.patchValue({ otherRural: currentVals.otherRural + entry.tseat });
+            categoryControl.patchValue({
+              otherRural: (currentVals.otherRural ?? 0) + (entry.tseat ?? 0),
+              total: (currentVals.total ?? 0) + (currentVals.otherRural ?? 0)
+            });
           }
-        } 
-        else if(['CT', 'CI'].includes(entry.quotaID))
-        {
+        }
+        else if (['CT', 'CI'].includes(entry.quotaID)) {
           this.seatType.set('central');
           if (entry.groupID === 'UR') {
-            switch(entry.seatType)
-            {
-              case('NA'): {
-                categoryControl.patchValue({ ci_ct_na_ur: currentVals.ci_ct_na_ur + entry.tseat });
-                break;}
-              case('PB'): {
-                categoryControl.patchValue({ ci_ct_pb_ur: currentVals.ci_ct_pb_ur + entry.tseat });
-                break;}
-              case('CH'): {
-                categoryControl.patchValue({ ci_ct_ch_ur: currentVals.ci_ct_ch_ur + entry.tseat });
-                break;}
-              case('HR'): {
-                categoryControl.patchValue({ ci_ct_hr_ur: currentVals.ci_ct_hr_ur + entry.tseat });
-                break;}
-              case('HP'): {
-                categoryControl.patchValue({ ci_ct_hp_ur: currentVals.ci_ct_hp_ur + entry.tseat });
-                break;}
-              case('JK'): {
-                categoryControl.patchValue({ ci_ct_jk_ur: currentVals.ci_ct_jk_ur + entry.tseat });
-                break;}
+            switch (entry.seatType) {
+              case ('NA'): {
+                categoryControl.patchValue({
+                  ci_ct_na_ur: (currentVals.ci_ct_na_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_na_ur ?? 0)
+                });
+                break;
+              }
+              case ('PB'): {
+                categoryControl.patchValue({
+                  ci_ct_pb_ur: (currentVals.ci_ct_pb_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_pb_ur ?? 0)
+                });
+                break;
+              }
+              case ('CH'): {
+                categoryControl.patchValue({
+                  ci_ct_ch_ur: (currentVals.ci_ct_ch_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_ch_ur ?? 0)
+                });
+                break;
+              }
+              case ('HR'): {
+                categoryControl.patchValue({
+                  ci_ct_hr_ur: (currentVals.ci_ct_hr_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_hr_ur ?? 0)
+                });
+                break;
+              }
+              case ('HP'): {
+                categoryControl.patchValue({
+                  ci_ct_hp_ur: (currentVals.ci_ct_hp_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_hp_ur ?? 0)
+                });
+                break;
+              }
+              case ('JK'): {
+                categoryControl.patchValue({
+                  ci_ct_jk_ur: (currentVals.ci_ct_jk_ur ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_jk_ur ?? 0)
+                });
+                break;
+              }
               default: break;
             }
-            
+
           } else if (entry.groupID === 'RU') {
-            switch(entry.seatType)
-            {
-              case('NA'): {
-                categoryControl.patchValue({ ci_ct_na_ru: currentVals.ci_ct_na_ru + entry.tseat });
-                break;}
-              case('PB'): {
-                categoryControl.patchValue({ ci_ct_pb_ru: currentVals.ci_ct_pb_ru + entry.tseat });
-                break;}
-              case('CH'): {
-                categoryControl.patchValue({ ci_ct_ch_ru: currentVals.ci_ct_ch_ru + entry.tseat });
-                break;}
-              case('HR'): {
-                categoryControl.patchValue({ ci_ct_hr_ru: currentVals.ci_ct_hr_ru + entry.tseat });
-                break;}
-              case('HP'): {
-                categoryControl.patchValue({ ci_ct_hp_ru: currentVals.ci_ct_hp_ru + entry.tseat });
-                break;}
-              case('JK'): {
-                categoryControl.patchValue({ ci_ct_jk_ru: currentVals.ci_ct_jk_ru + entry.tseat });
-                break;}
+            switch (entry.seatType) {
+              case ('NA'): {
+                categoryControl.patchValue({
+                  ci_ct_na_ru: (currentVals.ci_ct_na_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_na_ru ?? 0)
+                });
+                break;
+              }
+              case ('PB'): {
+                categoryControl.patchValue({
+                  ci_ct_pb_ru: (currentVals.ci_ct_pb_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_pb_ru ?? 0)
+                });
+                break;
+              }
+              case ('CH'): {
+                categoryControl.patchValue({
+                  ci_ct_ch_ru: (currentVals.ci_ct_ch_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_ch_ru ?? 0)
+                });
+                break;
+              }
+              case ('HR'): {
+                categoryControl.patchValue({
+                  ci_ct_hr_ru: (currentVals.ci_ct_hr_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_hr_ru ?? 0)
+                });
+                break;
+              }
+              case ('HP'): {
+                categoryControl.patchValue({
+                  ci_ct_hp_ru: (currentVals.ci_ct_hp_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_hp_ru ?? 0)
+                });
+                break;
+              }
+              case ('JK'): {
+                categoryControl.patchValue({
+                  ci_ct_jk_ru: (currentVals.ci_ct_jk_ru ?? 0) + (entry.tseat ?? 0),
+                  total: (currentVals.total ?? 0) + (currentVals.ci_ct_jk_ru ?? 0)
+                });
+                break;
+              }
               default: break;
             }
-        } 
-      }
-      else // feewaiver
-      {
-        if (entry.quotaID === 'UT' && entry.groupID === 'UR') {
-          categoryControl.patchValue({ stateNonRural: currentVals.stateNonRural + entry.tseat });
-        } else if (entry.quotaID === 'UT' && entry.groupID === 'RU') {
-          categoryControl.patchValue({ stateRural: currentVals.stateRural + entry.tseat });
-        } else if (entry.quotaID === 'OU' && entry.groupID === 'UR') {
-          categoryControl.patchValue({ otherNonRural: currentVals.otherNonRural + entry.tseat });
-        } else if (entry.quotaID === 'OU' && entry.groupID === 'RU') {
-          categoryControl.patchValue({ otherRural: currentVals.otherRural + entry.tseat });
+          }
         }
-      } 
       }
     });
   }
@@ -251,31 +358,27 @@ export class SeatMatrix implements OnInit {
       const catName = val.categoryName;
 
       // Create separate entries for each grid intersection
-      if(this.filterForm.value.institute.instituteType == '01')
-      {
-        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', val.stateNonRural));
-        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', val.stateRural));
-        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', val.otherNonRural));
-        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', val.otherRural));
+      if (this.filterForm.value.institute.instituteType == '01') {
+        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', val.stateNonRural, 'NA'));
+        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', val.stateRural, 'NA'));
+        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', val.otherNonRural, 'NA'));
+        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', val.otherRural, 'NA'));
       }
-      else if(this.filterForm.value.institute.instituteType == '02')
-      {
-        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'UR', val.stateNonRural));
-        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'RU', val.stateRural));
-        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', val.otherNonRural));
-        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural));
+      else if (this.filterForm.value.institute.instituteType == '02') {
+        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'UR', val.stateNonRural, 'NA'));
+        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'RU', val.stateRural, 'NA'));
+        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', val.otherNonRural, 'NA'));
+        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural, 'NA'));
       }
-      else if(this.filterForm.value.institute.instituteType == '03')
-      {
-        if (val.ci_ct_na_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_na_ur));
-        if (val.ci_ct_pb_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_pb_ur));
-        if (val.ci_ct_ch_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_ch_ur));
-        if (val.ci_ct_hr_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hr_ur));
-        if (val.ci_ct_hp_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hp_ur));
-        if (val.ci_ct_jk_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_jk_ur));
+      else if (this.filterForm.value.institute.instituteType == '03') {
+        if (val.ci_ct_na_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_na_ur, 'NA'));
+        if (val.ci_ct_pb_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_pb_ur, 'PB'));
+        if (val.ci_ct_ch_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_ch_ur, 'CH'));
+        if (val.ci_ct_hr_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hr_ur, 'HR'));
+        if (val.ci_ct_hp_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hp_ur, 'HP'));
+        if (val.ci_ct_jk_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_jk_ur, 'JK'));
       }
-      else if(this.filterForm.value.institute.instituteType == '04')
-      {
+      else if (this.filterForm.value.institute.instituteType == '04') {
         if (val.ci_ct_na_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_na_ur, 'NA'));
         if (val.ci_ct_pb_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_pb_ur, 'PB'));
         if (val.ci_ct_ch_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_ch_ur, 'CH'));
@@ -288,7 +391,7 @@ export class SeatMatrix implements OnInit {
     return flatData;
   }
 
-  private createFlatEntry(categoryId: string, categoryName: string, quotaId: string, groupId: string, tSeat: number, seatType: string | null = null) {
+  private createFlatEntry(categoryId: string, categoryName: string, quotaId: string, groupId: string, tSeat: number, seatType: string) {
     return {
       categoryID: categoryId,
       categoryName: categoryName,
@@ -306,14 +409,12 @@ export class SeatMatrix implements OnInit {
   // -------------------------
 
   onView(): void {
-    if(this.filterForm.valid)
-    {      
+    if (this.filterForm.valid) {
       const filters = this.filterForm.value;
-      console.log('Fetching data with filters:', filters);
       let req = {
         roundNo: filters.counselling,
         instituteID: filters.institute.instituteID,
-        courseID: filters.course,
+        courseID: filters.course.courseID,
         streamID: filters.stream
 
       }
@@ -322,7 +423,8 @@ export class SeatMatrix implements OnInit {
         next: (response: any[]) => {
           if (response && response.length > 0) {
             let reqJson = {
-              typeID: filters.institute.instituteType
+              typeID: filters.institute.instituteType,
+              courseID: filters.course.courseID
             };
             this.seatMatrixService.getCategories(reqJson).subscribe(data => {
               this.categories = [...data];
@@ -331,10 +433,13 @@ export class SeatMatrix implements OnInit {
                 this.seatCategories.push(this.createCategoryGroup(category));
               });
               this.cdr.detectChanges();
-              setTimeout(() => {this.isView.set(true);
-              this.populateFormFromData(response);}, 100);              
-            });            
+              setTimeout(() => {
+                this.isView.set(true);
+                this.populateFormFromData(response);
+              }, 100);
+            });
           } else {
+            this.onCancel();
           }
         },
         error: (err) => {
@@ -342,21 +447,28 @@ export class SeatMatrix implements OnInit {
         }
       });
     }
-    else
-    {
-      
+    else {
+      alert('Please fill all required inputs!');
     }
+  }
+
+  resetSeatMatrixData() {
+    this.categories = [];
+    this.seatMatrixForm.setControl('seatCategories', this.fb.array([]));
   }
 
   onCancel(): void {
     this.isView.set(false);
+    this.resetSeatMatrixData();
     this.filterForm.reset({
       stream: null,
       instituteType: null,
       institute: null,
       course: null,
+      courseType: 'N',
       counselling: '1'
     });
+    this.cdr.detectChanges();
   }
 
   onSubmitSeatMatrix(): void {
@@ -366,21 +478,23 @@ export class SeatMatrix implements OnInit {
     const req = {
       streamID: filters.stream,
       instituteID: filters.institute.instituteID,
-      courseID: filters.course,
+      courseID: filters.course.courseID,
       roundNo: filters.counselling,
       seatMatrixData: dataToSave
     }
-
-    console.log('Flat Data to save to DB:', req);
     // Call API using service
     this.seatMatrixService.saveSeatMatrixData(req).subscribe({
       next: (res) => {
-        console.log('Save successful', res);
-        alert('Data saved successfully!');
+        if (res && res.response == 1) {
+          alert('Data saved successfully!');
+        }
+        else {
+          alert(res.message ?? 'Failed to submit!');
+        }
       },
       error: (err) => {
         console.error('Save failed', err);
-        alert('Save failed or API endpoint not found. Simulated success!');
+        alert('Something went wrong');
       }
     });
   }
@@ -396,4 +510,23 @@ export class SeatMatrix implements OnInit {
     });
   }
 
+  getCourses() {
+    const typeId = this.filterForm.get('courseType')?.value;
+    this.courses = [];
+    this.filterForm.get('course')?.setValue(null);
+
+    this.seatMatrixService.getCourses(typeId).subscribe(data => {
+      this.courses = data;
+    });
+  }
+
+  CalculateSeat(form: any) {
+    (form as FormGroup).patchValue(
+      {
+        total: Number(form.get('stateNonRural')?.value) + Number(form.get('stateRural')?.value) + Number(form.get('otherNonRural')?.value) + Number(form.get('otherRural')?.value)
+          + Number(form.get('ci_ct_na_ur')?.value) + Number(form.get('ci_ct_pb_ur')?.value) + Number(form.get('ci_ct_ch_ur')?.value)
+          + Number(form.get('ci_ct_hr_ur')?.value) + Number(form.get('ci_ct_hp_ur')?.value) + Number(form.get('ci_ct_jk_ur')?.value)
+      }
+    )
+  }
 }

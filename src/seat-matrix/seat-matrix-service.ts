@@ -8,7 +8,7 @@ import { Observable, of } from 'rxjs';
 })
 export class SeatMatrixService {
   // Replace with your actual API base URL
-  private apiUrl = 'https://localhost:44334/SeatMatrix';
+  private apiUrl = 'https://localhost:7189/SeatMatrix';
 
   constructor(private http: HttpClient) { }
 
@@ -26,9 +26,9 @@ export class SeatMatrixService {
     return this.http.post<any[]>(`${this.apiUrl}/FetchInstitutes`, typeId);
   }
 
-  getCourses(instituteId?: string): Observable<any[]> {
+  getCourses(courseType: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/FetchCourses`, {
-      params: { instituteId: instituteId || '' }
+      params: { status: courseType }
     });
   }
 
