@@ -36,6 +36,7 @@
                         <div class="col-sm-12">
                             <select class="form-select form-select-sm" formControlName="courseType" placeholder="Please Select"
                             (change)="getCourses()">
+                                <option value="" disabled>Please Select</option>
                                 <option value="Y">Fee Waiver</option>
                                 <option value="N">Non Fee Waiver</option>
                             </select>
@@ -86,7 +87,7 @@
                             }
 
                             @if(seatType() == 'central'){
-                            <th colspan="1" class="text-center text-primary-dark">NA</th>
+                            <th colspan="1" class="text-center text-primary-dark">AI</th>
                             <th colspan="1" class="text-center text-primary-dark">PB</th>
                             <th colspan="1" class="text-center text-primary-dark">CH</th>
                             <th colspan="1" class="text-center text-primary-dark">HRY</th>

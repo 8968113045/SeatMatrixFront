@@ -68,7 +68,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
   loadDropdownData(): void {
     this.seatMatrixService.getStreams().subscribe(data => this.streams = data);
     this.seatMatrixService.getInstituteTypes().subscribe(data => this.instituteTypes = data);
-    this.getCourses();
+    // this.getCourses();
   }
 
   initFilterForm(): void {
@@ -77,7 +77,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
       instituteType: [null, [Validators.required]],
       institute: [null, [Validators.required]],
       course: [null, [Validators.required]],
-      courseType: ['N', [Validators.required]],
+      courseType: ['', [Validators.required]],
       counselling: ['1', [Validators.required]]
     });
     if (!this.streamSubscription) {
@@ -141,23 +141,32 @@ export class SeatMatrix implements OnInit, OnDestroy {
     }
     else {
       if (['01'].includes(this.filterForm.value.institute.instituteType)) {
+        if(!['904735', '904839'].includes(this.filterForm.value.institute.instituteID))
+        {
+          fb.get('otherRural')?.disable();
+          fb.get('stateRural')?.disable();
+        }   
+
         if (!['OP', '01', 'SC', 'ST', 'BC'].includes(category.categoryID)) {
           fb.get('otherNonRural')?.disable();
           fb.get('otherRural')?.disable();
         }
         else {
           fb.get('otherNonRural')?.enable();
-          fb.get('otherRural')?.enable();
         }
       }
       else if (['02'].includes(this.filterForm.value.institute.instituteType)) {
+        if(!['904735', '904839'].includes(this.filterForm.value.institute.instituteID))
+        {
+          fb.get('otherRural')?.disable();
+          fb.get('stateRural')?.disable();
+        } 
+
         if (['OP', 'SC', '13', '04'].includes(category.categoryID)) {
           fb.get('stateNonRural')?.enable();
-          fb.get('stateRural')?.enable();
         }
         else {
           fb.get('stateNonRural')?.disable();
-          fb.get('stateRural')?.disable();
         }
       }
       else if (['03', '04'].includes(this.filterForm.value.institute.instituteType)) {
@@ -171,7 +180,6 @@ export class SeatMatrix implements OnInit, OnDestroy {
         }
       }
     }
-
     return fb;
   }
 
@@ -356,35 +364,38 @@ export class SeatMatrix implements OnInit, OnDestroy {
       const val = control.value;
       const catCode = val.categoryID;
       const catName = val.categoryName;
-
       // Create separate entries for each grid intersection
       if (this.filterForm.value.institute.instituteType == '01') {
-        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', val.stateNonRural, 'NA'));
-        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', val.stateRural, 'NA'));
-        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', val.otherNonRural, 'NA'));
-        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', val.otherRural, 'NA'));
+        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ?? 0), 'NA'));        
+        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', (val.stateNonRural ?? 0), 'NA'));        
+
+        if(['904735', '904839'].includes(formVals.institute.instituteID))
+        {
+          if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ?? 0), 'NA'));
+          if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ?? 0), 'NA'));
+        }
       }
       else if (this.filterForm.value.institute.instituteType == '02') {
-        if (val.stateNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'UR', val.stateNonRural, 'NA'));
-        if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CH', 'RU', val.stateRural, 'NA'));
-        if (val.otherNonRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', val.otherNonRural, 'NA'));
-        if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural, 'NA'));
+        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'UR', (val.stateNonRural ?? 0), 'NA'));
+        // if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'RU', val.stateRural, 'NA'));
+        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', (val.otherNonRural ?? 0), 'NA'));
+        // if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural, 'NA'));
       }
       else if (this.filterForm.value.institute.instituteType == '03') {
-        if (val.ci_ct_na_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_na_ur, 'NA'));
-        if (val.ci_ct_pb_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_pb_ur, 'PB'));
-        if (val.ci_ct_ch_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_ch_ur, 'CH'));
-        if (val.ci_ct_hr_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hr_ur, 'HR'));
-        if (val.ci_ct_hp_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_hp_ur, 'HP'));
-        if (val.ci_ct_jk_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', val.ci_ct_jk_ur, 'JK'));
+        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_na_ur ?? 0), 'NA'));
+        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_pb_ur ?? 0), 'PB'));
+        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_ch_ur ?? 0), 'CH'));
+        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hr_ur ?? 0), 'HR'));
+        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hp_ur ?? 0), 'HP'));
+        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_jk_ur ?? 0), 'JK'));
       }
       else if (this.filterForm.value.institute.instituteType == '04') {
-        if (val.ci_ct_na_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_na_ur, 'NA'));
-        if (val.ci_ct_pb_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_pb_ur, 'PB'));
-        if (val.ci_ct_ch_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_ch_ur, 'CH'));
-        if (val.ci_ct_hr_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_hr_ur, 'HR'));
-        if (val.ci_ct_hp_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_hp_ur, 'HP'));
-        if (val.ci_ct_jk_ur > 0) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', val.ci_ct_jk_ur, 'JK'));
+        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_na_ur ?? 0), 'NA'));
+        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_pb_ur ?? 0), 'PB'));
+        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_ch_ur ?? 0), 'CH'));
+        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hr_ur ?? 0), 'HR'));
+        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hp_ur ?? 0), 'HP'));
+        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_jk_ur ?? 0), 'JK'));
       }
     });
 
@@ -432,14 +443,15 @@ export class SeatMatrix implements OnInit, OnDestroy {
               this.categories.forEach(category => {
                 this.seatCategories.push(this.createCategoryGroup(category));
               });
-              this.cdr.detectChanges();
+              
               setTimeout(() => {
                 this.isView.set(true);
                 this.populateFormFromData(response);
+                this.cdr.detectChanges();
               }, 100);
             });
           } else {
-            this.onCancel();
+            this.resetSeatMatrixData();
           }
         },
         error: (err) => {
@@ -453,19 +465,21 @@ export class SeatMatrix implements OnInit, OnDestroy {
   }
 
   resetSeatMatrixData() {
-    this.categories = [];
+    this.categories = [];    
     this.seatMatrixForm.setControl('seatCategories', this.fb.array([]));
   }
 
   onCancel(): void {
     this.isView.set(false);
     this.resetSeatMatrixData();
+    this.institutes = [];
+    this.courses = [];
     this.filterForm.reset({
       stream: null,
       instituteType: null,
       institute: null,
       course: null,
-      courseType: 'N',
+      courseType: '',
       counselling: '1'
     });
     this.cdr.detectChanges();
