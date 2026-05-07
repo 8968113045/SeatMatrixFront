@@ -138,10 +138,15 @@ export class SeatMatrix implements OnInit, OnDestroy {
       fb.get('stateRural')?.disable();
       fb.get('otherNonRural')?.disable();
       fb.get('otherRural')?.disable();
+      fb.get('ci_ct_na_ur')?.disable();
+      fb.get('ci_ct_ch_ur')?.disable();
+      fb.get('ci_ct_hr_ur')?.disable();
+      fb.get('ci_ct_hp_ur')?.disable();
+      fb.get('ci_ct_jk_ur')?.disable();
     }
     else {
       if (['01'].includes(this.filterForm.value.institute.instituteType)) {
-        if(!['904735', '904839'].includes(this.filterForm.value.institute.instituteID))
+        if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
         {
           fb.get('otherRural')?.disable();
           fb.get('stateRural')?.disable();
@@ -156,7 +161,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
         }
       }
       else if (['02'].includes(this.filterForm.value.institute.instituteType)) {
-        if(!['904735', '904839'].includes(this.filterForm.value.institute.instituteID))
+        if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
         {
           fb.get('otherRural')?.disable();
           fb.get('stateRural')?.disable();
@@ -369,7 +374,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
         if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ?? 0), 'NA'));        
         if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', (val.stateNonRural ?? 0), 'NA'));        
 
-        if(['904735', '904839'].includes(formVals.institute.instituteID))
+        if(['904717', '904773'].includes(formVals.institute.instituteID))
         {
           if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ?? 0), 'NA'));
           if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ?? 0), 'NA'));
