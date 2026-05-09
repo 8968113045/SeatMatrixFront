@@ -125,51 +125,51 @@
                             </td>
                             @if(seatType() == 'noncentral'){
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="stateNonRural" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="stateNonRural" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="stateRural" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="stateRural" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="otherNonRural" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="otherNonRural" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="otherRural" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="otherRural" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             }
                             
                             @if(seatType() == 'central'){
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_na_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_na_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_pb_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_pb_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_ch_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_ch_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_hr_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_hr_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_hp_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_hp_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input"
-                                    formControlName="ci_ct_jk_ur" min="0" (input)="CalculateSeat(cat)">
+                                <input type="text" class="form-control form-control-sm text-center number-input"
+                                    formControlName="ci_ct_jk_ur" (keydown)="sanitizeInput($event)" (input)="CalculateSeat(cat)">
                             </td>
                             }
                             <td>
-                                <input type="number" class="form-control form-control-sm text-center number-input readonly-cls"
+                                <input type="text" class="form-control form-control-sm text-center number-input readonly-cls"
                                     formControlName="total" readonly>
                             </td>
                         </tr>

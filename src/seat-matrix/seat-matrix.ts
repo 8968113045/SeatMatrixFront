@@ -138,7 +138,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
       fb.get('stateRural')?.disable();
       fb.get('otherNonRural')?.disable();
       fb.get('otherRural')?.disable();
-      fb.get('ci_ct_na_ur')?.disable();
+      fb.get('ci_ct_pb_ur')?.disable();
       fb.get('ci_ct_ch_ur')?.disable();
       fb.get('ci_ct_hr_ur')?.disable();
       fb.get('ci_ct_hp_ur')?.disable();
@@ -371,36 +371,36 @@ export class SeatMatrix implements OnInit, OnDestroy {
       const catName = val.categoryName;
       // Create separate entries for each grid intersection
       if (this.filterForm.value.institute.instituteType == '01') {
-        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ?? 0), 'NA'));        
-        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', (val.stateNonRural ?? 0), 'NA'));        
+        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));        
+        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', (val.stateNonRural ? Number(val.stateNonRural) : 0), 'NA'));        
 
         if(['904717', '904773'].includes(formVals.institute.instituteID))
         {
-          if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ?? 0), 'NA'));
-          if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ?? 0), 'NA'));
+          if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ? Number(val.stateRural) : 0), 'NA'));
+          if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ? Number(val.otherRural) : 0), 'NA'));
         }
       }
       else if (this.filterForm.value.institute.instituteType == '02') {
-        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'UR', (val.stateNonRural ?? 0), 'NA'));
+        if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'UR', (val.stateNonRural ? Number(val.stateNonRural) : 0), 'NA'));
         // if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'RU', val.stateRural, 'NA'));
-        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', (val.otherNonRural ?? 0), 'NA'));
+        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));
         // if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural, 'NA'));
       }
       else if (this.filterForm.value.institute.instituteType == '03') {
-        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_na_ur ?? 0), 'NA'));
-        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_pb_ur ?? 0), 'PB'));
-        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_ch_ur ?? 0), 'CH'));
-        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hr_ur ?? 0), 'HR'));
-        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hp_ur ?? 0), 'HP'));
-        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_jk_ur ?? 0), 'JK'));
+        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_na_ur ? Number(val.ci_ct_na_ur) : 0), 'NA'));
+        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
+        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
+        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
+        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
+        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
       }
       else if (this.filterForm.value.institute.instituteType == '04') {
-        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_na_ur ?? 0), 'NA'));
-        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_pb_ur ?? 0), 'PB'));
-        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_ch_ur ?? 0), 'CH'));
-        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hr_ur ?? 0), 'HR'));
-        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hp_ur ?? 0), 'HP'));
-        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_jk_ur ?? 0), 'JK'));
+        if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_na_ur ? Number(val.ci_ct_na_ur) : 0), 'NA'));
+        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
+        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
+        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
+        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
+        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
       }
     });
 
@@ -548,4 +548,14 @@ export class SeatMatrix implements OnInit, OnDestroy {
       }
     )
   }
+  
+  sanitizeInput(e: any)
+  {
+    const isNumber = /^[0-9]$/.test(e.key);
+    const isUtilityKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key);
+    
+    if (!isNumber && !isUtilityKey) {
+      e.preventDefault();
+    }
+  };
 }
