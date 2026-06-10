@@ -134,7 +134,7 @@ export class SeatMatrix implements OnInit, OnDestroy {
       ci_ct_jk_ur: [0],
       total: [0]
     });
-    if (this.filterForm.value.course.feeWStatus == 'Y') {
+    // if (this.filterForm.value.course.feeWStatus == 'Y') {
       fb.get('stateRural')?.disable();
       fb.get('otherNonRural')?.disable();
       fb.get('otherRural')?.disable();
@@ -143,48 +143,48 @@ export class SeatMatrix implements OnInit, OnDestroy {
       fb.get('ci_ct_hr_ur')?.disable();
       fb.get('ci_ct_hp_ur')?.disable();
       fb.get('ci_ct_jk_ur')?.disable();
-    }
-    else {
-      if (['01'].includes(this.filterForm.value.institute.instituteType)) {
-        if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
-        {
-          fb.get('otherRural')?.disable();
-          fb.get('stateRural')?.disable();
-        }   
+    // }
+    // else {
+    //   if (['01'].includes(this.filterForm.value.institute.instituteType)) {
+    //     if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
+    //     {
+    //       fb.get('otherRural')?.disable();
+    //       fb.get('stateRural')?.disable();
+    //     }   
 
-        if (!['OP', '01', 'SC', 'ST', 'BC'].includes(category.categoryID)) {
-          fb.get('otherNonRural')?.disable();
-          fb.get('otherRural')?.disable();
-        }
-        else {
-          fb.get('otherNonRural')?.enable();
-        }
-      }
-      else if (['02'].includes(this.filterForm.value.institute.instituteType)) {
-        if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
-        {
-          fb.get('otherRural')?.disable();
-          fb.get('stateRural')?.disable();
-        } 
+    //     if (!['OP', '01', 'SC', 'ST', 'BC'].includes(category.categoryID)) {
+    //       fb.get('otherNonRural')?.disable();
+    //       fb.get('otherRural')?.disable();
+    //     }
+    //     else {
+    //       fb.get('otherNonRural')?.enable();
+    //     }
+    //   }
+    //   else if (['02'].includes(this.filterForm.value.institute.instituteType)) {
+    //     if(!['904717', '904773'].includes(this.filterForm.value.institute.instituteID))
+    //     {
+    //       fb.get('otherRural')?.disable();
+    //       fb.get('stateRural')?.disable();
+    //     } 
 
-        if (['OP', 'SC', '13', '04'].includes(category.categoryID)) {
-          fb.get('stateNonRural')?.enable();
-        }
-        else {
-          fb.get('stateNonRural')?.disable();
-        }
-      }
-      else if (['03', '04'].includes(this.filterForm.value.institute.instituteType)) {
-        if (['01'].includes(category.categoryID)) {
-          fb.get('ci_ct_na_ur')?.enable(),
-            fb.get('ci_ct_pb_ur')?.disable(),
-            fb.get('ci_ct_ch_ur')?.disable(),
-            fb.get('ci_ct_hr_ur')?.disable(),
-            fb.get('ci_ct_hp_ur')?.disable(),
-            fb.get('ci_ct_jk_ur')?.disable()
-        }
-      }
-    }
+    //     if (['OP', 'SC', '13', '04'].includes(category.categoryID)) {
+    //       fb.get('stateNonRural')?.enable();
+    //     }
+    //     else {
+    //       fb.get('stateNonRural')?.disable();
+    //     }
+    //   }
+    //   else if (['03', '04'].includes(this.filterForm.value.institute.instituteType)) {
+    //     if (['01'].includes(category.categoryID)) {
+    //       fb.get('ci_ct_na_ur')?.enable(),
+    //         fb.get('ci_ct_pb_ur')?.disable(),
+    //         fb.get('ci_ct_ch_ur')?.disable(),
+    //         fb.get('ci_ct_hr_ur')?.disable(),
+    //         fb.get('ci_ct_hp_ur')?.disable(),
+    //         fb.get('ci_ct_jk_ur')?.disable()
+    //     }
+    //   }
+    // }
     return fb;
   }
 
@@ -371,36 +371,36 @@ export class SeatMatrix implements OnInit, OnDestroy {
       const catName = val.categoryName;
       // Create separate entries for each grid intersection
       if (this.filterForm.value.institute.instituteType == '01') {
-        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));        
+        // if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));        
         if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'UR', (val.stateNonRural ? Number(val.stateNonRural) : 0), 'NA'));        
 
-        if(['904717', '904773'].includes(formVals.institute.instituteID))
-        {
-          if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ? Number(val.stateRural) : 0), 'NA'));
-          if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ? Number(val.otherRural) : 0), 'NA'));
-        }
+        // if(['904717', '904773'].includes(formVals.institute.instituteID))
+        // {
+        //   if (val.stateRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'PB', 'RU', (val.stateRural ? Number(val.stateRural) : 0), 'NA'));
+        //   if (val.otherRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OP', 'RU', (val.otherRural ? Number(val.otherRural) : 0), 'NA'));
+        // }
       }
       else if (this.filterForm.value.institute.instituteType == '02') {
         if (val.stateNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'UR', (val.stateNonRural ? Number(val.stateNonRural) : 0), 'NA'));
         // if (val.stateRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'UT', 'RU', val.stateRural, 'NA'));
-        if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));
+        // if (val.otherNonRural != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'UR', (val.otherNonRural ? Number(val.otherNonRural) : 0), 'NA'));
         // if (val.otherRural > 0) flatData.push(this.createFlatEntry(catCode, catName, 'OU', 'RU', val.otherRural, 'NA'));
       }
       else if (this.filterForm.value.institute.instituteType == '03') {
         if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_na_ur ? Number(val.ci_ct_na_ur) : 0), 'NA'));
-        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
-        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
-        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
-        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
-        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
+        // if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
+        // if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
+        // if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
+        // if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
+        // if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CT', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
       }
       else if (this.filterForm.value.institute.instituteType == '04') {
         if (val.ci_ct_na_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_na_ur ? Number(val.ci_ct_na_ur) : 0), 'NA'));
-        if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
-        if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
-        if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
-        if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
-        if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
+        // if (val.ci_ct_pb_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_pb_ur ? Number(val.ci_ct_pb_ur) : 0), 'PB'));
+        // if (val.ci_ct_ch_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_ch_ur ? Number(val.ci_ct_ch_ur) : 0), 'CH'));
+        // if (val.ci_ct_hr_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hr_ur ? Number(val.ci_ct_hr_ur) : 0), 'HR'));
+        // if (val.ci_ct_hp_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_hp_ur ? Number(val.ci_ct_hp_ur) : 0), 'HP'));
+        // if (val.ci_ct_jk_ur != undefined) flatData.push(this.createFlatEntry(catCode, catName, 'CI', 'UR', (val.ci_ct_jk_ur ? Number(val.ci_ct_jk_ur) : 0), 'JK'));
       }
     });
 
